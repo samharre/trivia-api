@@ -54,7 +54,6 @@ def create_app(test_config=None):
   '''
   @app.route('/categories')
   def get_categories():
-
     categories = Category.query.order_by(Category.id).all()
 
     return jsonify({
@@ -77,7 +76,6 @@ def create_app(test_config=None):
   '''
   @app.route('/questions')
   def get_questions():
-
     categories = Category.query.order_by(Category.id).all()
     questions = Question.query.order_by(Question.id).all()
     current_questions = paginate_questions(request, questions)
@@ -86,11 +84,11 @@ def create_app(test_config=None):
       abort(404)
 
     return jsonify({
+      'success': True,
       'questions': current_questions,
       'total_questions': len(questions),
       'categories': {category.id: category.type for category in categories},
-      'current_category': None,
-      'success': True
+      'current_category': None
     })
 
 
@@ -103,7 +101,6 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
-    
     question = Question.query.get(question_id)
     if not question:
       abort(422)
@@ -131,7 +128,6 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=['POST'])
   def create_question():
-    
     body = request.get_json()
     if not body:
       abort(400)
@@ -167,6 +163,25 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
+  @app.route('/questions/search', methods=['POST'])
+  def search_question_by_term():
+    body = request.get_json()
+    if not body:
+      abort(400)
+
+    search_term = body.get('searchTerm', '')
+    if search_term:
+      questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).order_by(Question.id).all()
+    
+      return jsonify({
+        'success': True,
+        'questions': [question.format() for question in questions],
+        'total_questions': len(questions),
+        'current_category': None
+      })
+    else:
+      abort(422)
+
 
   '''
   @TODO: 

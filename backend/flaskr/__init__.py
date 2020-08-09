@@ -170,17 +170,19 @@ def create_app(test_config=None):
       abort(400)
 
     search_term = body.get('searchTerm', '')
-    if search_term:
+    if not search_term:
+      abort(422)
+
+    try:
       questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).order_by(Question.id).all()
-    
       return jsonify({
         'success': True,
         'questions': [question.format() for question in questions],
         'total_questions': len(questions),
         'current_category': None
       })
-    else:
-      abort(422)
+    except:
+      abort(500)
 
 
   '''
@@ -191,7 +193,24 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+  @app.route('/categories/<int:category_id>/questions')
+  def get_questions_by_category(category_id):
+    category = Category.query.get(category_id)
+    if not category:
+      abort(404)
 
+    try:
+      questions = Question.query.filter(Question.category == category_id).all()
+      
+      return jsonify({
+        'success': True,
+        'questions': [question.format() for question in questions],
+        'total_questions': len(questions),
+        'current_category': category_id
+      })
+    except:
+      abort(500)
+    
 
   '''
   @TODO: 

@@ -43,8 +43,6 @@ def create_app(test_config=None):
       'success': True
     })
 
-    return 'Hello world'
-
 
   '''
   @TODO: 

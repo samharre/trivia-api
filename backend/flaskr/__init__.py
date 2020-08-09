@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
@@ -101,6 +101,19 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   '''
+  @app.route('/questions/<int:question_id>', methods=['DELETE'])
+  def delete_question(question_id):
+    try:
+      question = Question.query.get(question_id)
+      question.delete()
+      
+      return jsonify({
+        'success': True,
+        'deleted_id': question_id
+      })
+    except:
+      abort(422)
+      
 
   '''
   @TODO: 
@@ -112,6 +125,9 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  @app.route('/questions', methods=['POST'])
+  def create_question():
+    return jsonify({'success': True})
 
   '''
   @TODO: 
@@ -171,6 +187,10 @@ def create_app(test_config=None):
   def unprocessable(error):
     return format_error(422, 'Unprocessable')
 
+
+  @app.errorhandler(500)
+  def server_error(error):
+    return format_error(422, 'Internal server error')
 
   return app
 

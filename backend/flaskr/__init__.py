@@ -103,16 +103,20 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
+    
+    question = Question.query.get(question_id)
+    if not question:
+      abort(422)
+
     try:
-      question = Question.query.get(question_id)
       question.delete()
       
       return jsonify({
         'success': True,
-        'deleted_id': question_id
+        'question_id': question_id
       })
     except:
-      abort(422)
+      abort(500)
       
 
   '''
@@ -127,7 +131,31 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=['POST'])
   def create_question():
-    return jsonify({'success': True})
+    
+    body = request.get_json()
+    if not body:
+      abort(400)
+    
+    question = body.get('question')
+    answer = body.get('answer')
+    difficulty = body.get('difficulty')
+    category = body.get('category')
+    if not (question and answer and difficulty and category):
+      abort(422)
+
+    try:
+      obj_question = Question(
+        question=question, answer=answer, category=category, difficulty=int(difficulty)
+      )
+      obj_question.insert()
+
+      return jsonify({
+        'success': True,
+        'question_id': obj_question.id
+      })
+    except:
+      abort(500)
+
 
   '''
   @TODO: 
@@ -190,7 +218,7 @@ def create_app(test_config=None):
 
   @app.errorhandler(500)
   def server_error(error):
-    return format_error(422, 'Internal server error')
+    return format_error(500, 'Internal server error')
 
   return app
 

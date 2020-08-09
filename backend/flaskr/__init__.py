@@ -19,6 +19,14 @@ def paginate_questions(request, selection):
   return current_questions
 
 
+def format_error(status_code, message):
+  return jsonify({
+    'success': False,
+    'error': status_code,
+    'message': message
+  }), status_code
+
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -144,15 +152,26 @@ def create_app(test_config=None):
   including 404 and 422. 
   '''
 
+  @app.errorhandler(400)
+  def bad_request(error):
+    return format_error(400, 'Bad request')
+
+
   @app.errorhandler(404)
   def not_found(error):
-    return jsonify({
-      'success': False,
-      'error': 404,
-      'message': 'Resource not found'
-    }), 404
+    return format_error(404, 'Resource not found')
 
-  
+
+  @app.errorhandler(405)
+  def method_not_allowed(error):
+    return format_error(405, 'Method not allowed')
+
+
+  @app.errorhandler(422)
+  def unprocessable(error):
+    return format_error(422, 'Unprocessable')
+
+
   return app
 
     

@@ -66,12 +66,19 @@ class TriviaTestCase(unittest.TestCase):
     # ---------- Testes ---------- #
 
     def test_get_categories(self):
-        res = self.client().get('categories')
+        res = self.client().get('/categories')
         data = json.loads(res.data)
 
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
         self.assertTrue(len(data['categories']))
+
+
+    def test_get_categories_by_id(self):
+        res = self.client().get('/categories/1')
+        data = json.loads(res.data)
+
+        self.check_status_code_404(res.status_code, data)
         
     
     def test_get_paginated_questions(self):
@@ -81,9 +88,9 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
         self.assertTrue(len(data['questions']))
-        self.assertTrue(data['totalQuestions'])
+        self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['categories']))
-        self.assertFalse(data['currentCategory'])
+        self.assertEqual(data['current_category'], None)
         
 
     def test_404_sent_requesting_beyond_valid_page(self):
@@ -93,34 +100,48 @@ class TriviaTestCase(unittest.TestCase):
         self.check_status_code_404(res.status_code, data)
 
     
-    def test_get_quetions_per_category(self):
-        id_category = 1 # Science
-        res = self.client().get(f'/categories/{id_category}/questions')
+    def test_get_quetions_by_category(self):
+        category_id = 1 # Science
+        res = self.client().get(f'/categories/{category_id}/questions')
+        data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
         self.assertTrue(len(data['questions']))
-        self.assertTrue(data['totalQuestions'])
-        self.assertEqual(data['currentCategory'], id_category)
+        self.assertTrue(data['total_questions'])
+        self.assertEqual(data['current_category'], category_id)
         
 
-    def test_404_get_quetions_per_category_non_existent(self):
-        id_category = 100
-        res = self.client().get(f'/categories/{id_category}/questions')
+    def test_404_get_quetions_by_non_existent_category(self):
+        category_id = 100
+        res = self.client().get(f'/categories/{category_id}/questions')
+        data = json.loads(res.data)
 
         self.check_status_code_404(res.status_code, data)
 
 
-    def test_search_questions_per_term(self):
-        search_term = 'peanut'
+    def test_search_questions_by_term(self):
+        search_term = 'title'
         res = self.client().post('/questions/search', json={'searchTerm': search_term})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
         self.assertTrue(len(data['questions']))
-        self.assertTrue(data['totalQuestions'])
-        self.assertFalse(data['currentCategory'])
+        self.assertEqual(data['total_questions'], 2)
+        self.assertEqual(data['current_category'], None)
+
+
+    def test_search_questions_by_non_existent_term(self):
+        search_term = 'test123'
+        res = self.client().post('/questions/search', json={'searchTerm': search_term})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertEqual(len(data['questions']), 0)
+        self.assertEqual(data['total_questions'], 0)
+        self.assertEqual(data['current_category'], None)
 
 
     def test_400_fail_searching_questions_without_body(self):
@@ -130,29 +151,29 @@ class TriviaTestCase(unittest.TestCase):
         self.check_status_code_400(res.status_code, data)
 
 
-    def test_404_search_questions_per_term_non_existent(self):
-        search_term = '#%$^&!abc'
-        res = self.client().post('/questions/search', json={'searchTerm': search_term})
+    def test_422_search_questions_without_search_term(self):
+        res = self.client().post('/questions/search', json={'test': '123'})
         data = json.loads(res.data) 
 
-        self.check_status_code_404(res.status_code, data)
+        self.check_status_code_422(res.status_code, data)
 
 
     def test_create_new_question(self):
-        total_questions = len(Question.query.all())
+        total_questions_prev = len(Question.query.all())
     
         question = self.new_question()
         res = self.client().post('/questions', json=question)
         data = json.loads(res.data)
 
+        total_questions = len(Question.query.all())
+
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
-        self.assertTrue(len(data['questions']))
-        self.assertEqual(data['totalQuestions'], total_questions + 1)
-        self.assertEqual(data['currentCategory'], question['category'])
+        self.assertTrue(data['question_id'])
+        self.assertEqual(total_questions, total_questions_prev + 1)
 
 
-    def test_400_fail_creating_new_question_without_body(self):
+    def test_400_fail_creating_question_without_body(self):
         res = self.client().post('/questions')
         data = json.loads(res.data)
 
@@ -166,28 +187,68 @@ class TriviaTestCase(unittest.TestCase):
         self.check_status_code_405(res.status_code, data)
 
 
-    def test_delete_question(self):
-        id_question = 5
-        question_category = 4
-        total_questions = len(Question.query.all())
+    def test_422_fail_creating_question_without_required_item(self):
+        question = self.new_question()
+        question.pop('answer')
 
-        res = self.client().delete(f'/questions/{id_question}')
+        res = self.client().post('/questions', json=question)
         data = json.loads(res.data)
 
-        question = Question.query.filter(Question.id == id).one_or_none()
+        self.check_status_code_422(res.status_code, data)    
 
-        self.assertEquals(res.status_code, 200)
+
+    def test_delete_question(self):
+        question_id = 23
+        res = self.client().delete('/questions/{}'.format(question_id))
+        data = json.loads(res.data)
+
+        question = Question.query.filter(Question.id == question_id).one_or_none()
+        
+        self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
-        self.assertTrue(len(data['questions']))
-        self.assertEqual(data['totalQuestions'], total_questions - 1)
-        self.assertEqual(data['currentCategory'], question_category)
-        self.assertEquals(question, None)
+        self.assertEqual(data['question_id'], question_id)
+        self.assertEqual(question, None)
 
 
     def test_422_if_question_to_delete_does_not_exist(self):
-        id_question = 10000
-        res = self.client().delete(f'/questions/{id_question}')
+        question_id = 10000
+        res = self.client().delete('/questions/{}'.format(question_id))
         data = json.loads(res.data)
+
+        self.check_status_code_422(res.status_code, data)
+
+
+    def test_play_quizz(self):
+        body = {
+            "quiz_category": {"type": "click", "id": 0}, 
+            "previous_questions":[]
+        }
+        res = self.client().post('/quizzes', json=body)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertTrue(len(data['question']))
+
+
+    def test_400_fail_play_quizz_without_body(self):
+        res = self.client().post('/quizzes')
+        data = json.loads(res.data)
+
+        self.check_status_code_400(res.status_code, data)
+
+
+    def test_404_fail_play_quizz_wrong_route(self):
+        res = self.client().patch('/quizzes/5')
+        data = json.loads(res.data)
+
+        self.check_status_code_404(res.status_code, data)
+
+    
+    def test_422_fail_play_quizz_without_category(self):
+        body = {"previous_questions":[5,9,2,4,6]}
+        res = self.client().post('/quizzes', json={'test': '123'})
+        data = json.loads(res.data) 
 
         self.check_status_code_422(res.status_code, data)
 

@@ -211,7 +211,7 @@ The API will return five error types when requests fail:
 }
 ```
 
-#### GET categories/{category_id}/questions
+#### GET /categories/{category_id}/questions
 
 - General:
   - Fetches a list of questions for the specified category.
@@ -250,7 +250,7 @@ The API will return five error types when requests fail:
 }
 ```
 
-#### POST questions/search
+#### POST /questions/search
 
 - General:
   - Fetches a list of questions questions where a substring matches the search term. It's not case-sensitive.

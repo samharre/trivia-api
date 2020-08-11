@@ -69,8 +69,6 @@ One note before you delve into your tasks: for each endpoint you are expected to
 
 ## API Reference
 
-### Getting Started
-
 - Base URL: At present Trivia app can just be run locally using the default `http://127.0.0.1:5000`.
 
 ### Error Handling
@@ -98,7 +96,7 @@ The API will return five error types when requests fail:
 - General:
   - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
   - Request Arguments: None
-  - Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs.
+  - Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs and success value.
 - Sample: `curl http://127.0.0.1:5000/categories` 
 
 ```
@@ -121,7 +119,7 @@ The API will return five error types when requests fail:
 - General:
   - Fetches a list of questions paginated in groups of 10.
   - Request Arguments: (optional) `page: int`
-  - Returns: A dictionary containg categories, current category, total questions and a list with all questions paginated in groups of 10. Include a request argument to choose a page number, starting from 1.
+  - Returns: A dictionary containg categories, current category, total of questions, success value, and a list with all questions paginated in groups of 10. Include a request argument to choose a page number, starting from 1.
 - Sample: `curl http://127.0.0.1:5000/questions`
 
 ```
@@ -212,6 +210,46 @@ The API will return five error types when requests fail:
     "total_questions": 30
 }
 ```
+
+#### GET categories/{category_id}/questions
+
+- General:
+  - Fetches a list of questions for the specified category.
+  - Request Arguments: `category_id: int`
+  - Returns: Current category, total of questions, success value, and a list of questions for the specified category.
+- Sample: `curl http://127.0.0.1:5000/categories/5/questions`
+
+```
+{
+    "current_category": 5, 
+    "questions": [
+        {
+            "answer": "Apollo 13", 
+            "category": 5, 
+            "difficulty": 4, 
+            "id": 2, 
+            "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+        }, 
+        {
+            "answer": "Tom Cruise", 
+            "category": 5, 
+            "difficulty": 4, 
+            "id": 4, 
+            "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+        }, 
+        {
+            "answer": "Edward Scissorhands", 
+            "category": 5, 
+            "difficulty": 3, 
+            "id": 6, 
+            "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+        }
+    ], 
+    "success": true, 
+    "total_questions": 3
+}
+```
+
 
 
 REVIEW_COMMENT

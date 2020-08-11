@@ -94,7 +94,7 @@ The API will return five error types when requests fail:
 #### GET /categories
 
 - General:
-  - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+  - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category.
   - Request Arguments: None
   - Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs and success value.
 - Sample: `curl http://127.0.0.1:5000/categories` 
@@ -295,7 +295,7 @@ The API will return five error types when requests fail:
         "category": string
     }
   ```
-  - Returns: Question id and success value
+  - Returns: Question id and success value.
 - Sample: `curl -X POST -H 'Content-Type: application/json' -d '{"question":"Which is the largest country of South America?", "answer": "Brazil", "category":"3", "difficulty":2}' http://127.0.0.1:5000/questions`
 
 ```
@@ -304,6 +304,22 @@ The API will return five error types when requests fail:
     "success": true
 }
 ```
+
+#### DELETE /questions/{question_id}
+
+- General:
+  - Delete the question of the given id if it exists.
+  - Request Arguments: `question_id: int`
+  - Returns: Question id that was deleted and success value.
+- Sample: `curl -X DELETE http://127.0.0.1:5000/questions/14`
+
+```
+{
+    "question_id": 14, 
+    "success": true
+}
+```
+
 
 
 ## Testing

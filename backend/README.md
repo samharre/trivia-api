@@ -69,7 +69,7 @@ One note before you delve into your tasks: for each endpoint you are expected to
 
 ## API Reference
 
-- Base URL: At present Trivia app can just be run locally using the default `http://127.0.0.1:5000`.
+- Base URL: At present Trivia app can just be run locally using `http://127.0.0.1:5000`.
 
 ### Error Handling
 
@@ -250,29 +250,36 @@ The API will return five error types when requests fail:
 }
 ```
 
+#### POST questions/search
 
+- General:
+  - Fetches a list of questions questions where a substring matches the search term. It's not case-sensitive.
+  - Request body: `{searchTerm: string}`
+  - Returns: Current category, total of questions, success value, and a list of questions that matches the search term.
+- Sample: `curl -X POST -H 'Content-Type: application/json' -d '{"searchTerm":"title"}' http://127.0.0.1:5000/questions/search`
 
-REVIEW_COMMENT
 ```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
-
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
-
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
-
+{
+    "current_category": null, 
+    "questions": [
+        {
+            "answer": "Maya Angelou", 
+            "category": 4, 
+            "difficulty": 2, 
+            "id": 5, 
+            "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+        }, 
+        {
+            "answer": "Edward Scissorhands", 
+            "category": 5, 
+            "difficulty": 3, 
+            "id": 6, 
+            "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+        }
+    ], 
+    "success": true, 
+    "total_questions": 2
+}
 ```
 
 

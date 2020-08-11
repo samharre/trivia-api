@@ -71,7 +71,7 @@ One note before you delve into your tasks: for each endpoint you are expected to
 
 ### Getting Started
 
-- [Base URL]: At present moment, Trivia app can just be run locally using the default `http://127.0.0.1:5000`.
+- Base URL: At present Trivia app can just be run locally using the default `http://127.0.0.1:5000`.
 
 ### Error Handling
 
@@ -85,11 +85,11 @@ Errors are returned as JSON objects in the following format:
 ```
 The API will return five error types when requests fail:
 
-- [400]: Bad request
-- [404]: Resource not found
-- [405]: Method not allowed
-- [422]: Unprocessable
-- [500]: Internal server error
+- 400: Bad request
+- 404: Resource not found
+- 405: Method not allowed
+- 422: Unprocessable
+- 500: Internal server error
 
 
 

@@ -282,6 +282,29 @@ The API will return five error types when requests fail:
 }
 ```
 
+#### POST /questions
+
+- General:
+  - Creates a new question using the submitted question, answer, difficulty and category.
+  - Request body: 
+  ```
+    {
+        "question": string,
+        "answer": string,
+        "difficulty": int,
+        "category": string
+    }
+  ```
+  - Returns: Question id and success value
+- Sample: `curl -X POST -H 'Content-Type: application/json' -d '{"question":"Which is the largest country of South America?", "answer": "Brazil", "category":"3", "difficulty":2}' http://127.0.0.1:5000/questions`
+
+```
+{
+    "question_id": 39, 
+    "success": true
+}
+```
+
 
 ## Testing
 To run the tests, run

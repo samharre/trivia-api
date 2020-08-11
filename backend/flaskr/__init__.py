@@ -157,6 +157,7 @@ def create_app(test_config=None):
         if not (quiz_category):
             abort(422)
 
+        print('BODY FRONT', body)
         try:
             category_id = quiz_category.get('id')
             if category_id:
@@ -169,7 +170,7 @@ def create_app(test_config=None):
 
             return jsonify({
                 'success': True,
-                'question': questions[random.randrange(0, len(questions))].format() if len(questions) else {}
+                'question': questions[random.randrange(0, len(questions))].format() if len(questions) else None
             })
         except:
             abort(500)
@@ -201,5 +202,3 @@ def create_app(test_config=None):
 
 
     return app
-
-    

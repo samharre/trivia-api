@@ -320,7 +320,32 @@ The API will return five error types when requests fail:
 }
 ```
 
+#### POST /quizzes
 
+- General:
+  - Fetches a dictionary containing a random question within a specified category, disconsidering questions previously asked.
+  - Request body: 
+  ```
+    {
+        "quiz_category": {"type": string, "id": int}, 
+        "previous_questions": list
+    }
+  ```
+  - Returns: Success value and a dictionary of a question.
+- Sample: `curl -X POST -H 'Content-Type: application/json' -d '{"quiz_category": {"type": "click", "id": 0}, "previous_questions":[5,9,2,4,6]}' http://127.0.0.1:5000/quizzes`
+
+```
+{
+    "question": {
+        "answer": "Escher", 
+        "category": 2, 
+        "difficulty": 1, 
+        "id": 16, 
+        "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
+    }, 
+    "success": true
+}
+```
 
 ## Testing
 To run the tests, run

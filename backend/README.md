@@ -66,6 +66,34 @@ One note before you delve into your tasks: for each endpoint you are expected to
 8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
 9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
 
+
+## API Reference
+
+### Getting Started
+
+- [Base URL]: At present moment, Trivia app can just be run locally using the default `http://127.0.0.1:5000`.
+
+### Error Handling
+
+Errors are returned as JSON objects in the following format:
+```
+{
+    "success": false,
+    "error": 400,
+    "message": "Bad request"
+}
+```
+The API will return five error types when requests fail:
+
+- [400]: Bad request
+- [404]: Resource not found
+- [405]: Method not allowed
+- [422]: Unprocessable
+- [500]: Internal server error
+
+
+
+
 REVIEW_COMMENT
 ```
 This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
